@@ -1,0 +1,67 @@
+import serial
+import RPi.GPIO as GPIO      
+import os, time
+
+os.system("sudo chmod 777 /dev/serial0")
+os.system("sudo chown pi:pi /dev/serial0")
+
+# Find a suitable character in a text or string and get its position
+s1="""AT+CMGS="+9167142929"
+Parking Spot is occupied"""
+s2="occupied"
+
+#count = 0
+ 
+GPIO.setmode(GPIO.BOARD)    
+ 
+# Enable Serial Communication
+port = serial.Serial("/dev/serial0", baudrate=9600, timeout=1)
+#port.open()
+ 
+# Transmitting AT Commands to the Modem
+# '\r\n' indicates the Enter key
+
+
+port.write('AT'+'\r\n')
+port.write("\x0D\x0A")
+rcv = port.read(10)
+print (rcv)
+time.sleep(1)
+ 
+port.write('ATE0'+'\r\n')                 # Disable the Echo
+rcv = port.read(10)
+print (rcv)
+time.sleep(1)
+ 
+port.write('AT+CMGF=1'+'\r\n')            # Select Message format as Text mode 
+rcv = port.read(10)
+print (rcv)
+time.sleep(1)
+
+port.write('AT+CNMI=2,1,0,0,0'+'\r\n')      # New SMS Message Indications
+rcv = port.read(10)
+print (rcv)
+time.sleep(1)
+print("asfasg")
+time.sleep(2)
+ck=1
+#if (count <= 7):
+while ck==1:
+    rcv = port.read(10)
+    print rcv
+    fd=rcv
+    if len(rcv)>3:                   # check if any data received 
+        ck=12
+        for i in range(5):            
+            rcv = port.read(10)
+            print rcv
+            fd=fd+rcv
+            #count = count  + 1
+        break
+
+
+            
+print("asdafg")
+port.write('AT+CMGR=1'+'\r\n')            # Extract the complete data 
+asd=port.read(200)
+print(asd)
